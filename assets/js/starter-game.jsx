@@ -9,8 +9,10 @@ export default function game_init(root) {
 class Starter extends React.Component {
   constructor(props) {
     super(props);
+    let cards = ['A','A','B','B','C','C','D','D','E','E','F','F','G','G','H','H'];
+
     this.state = { 
-      cards: {},
+      cards: this.shuffleAndMap(cards),
       clickedCards: [],
       score: 0,
       clickCount: 0
@@ -23,9 +25,9 @@ class Starter extends React.Component {
     for (let i = 0; i < temp.length; i++){
       // Card Letter, Match has been Completed
       if(!result.has(temp[i] + "0")){
-        result.set((temp[i] + "0"), false);
+        result.set((temp[i] + "0"), [temp[i], false]);
       } else {
-        result.set((temp[i] + "1"), false);
+        result.set((temp[i] + "1"), [temp[i], false]);
       }
     }
     return result;
@@ -33,14 +35,16 @@ class Starter extends React.Component {
 
   createTable(input){
     let result = [];
-    for (let i of input.keys()) {
-      result.push(<td onClick={() => {this.click(i)}}>{i}</td>);
+    for (let [key, value] of input) {
+      result.push(<td onClick={() => {this.click(key)}}>{value}</td>);
     }
     return result;
   }
 
   click(clicked) {
     let temp = this.state.clickedCards;
+    let tempCards = this.state.cards;
+
     if (temp.length < 1) {
       console.log("Added!");
       temp.push(clicked)
@@ -49,25 +53,23 @@ class Starter extends React.Component {
       temp.push(clicked)
       
       if((temp[0].charAt(0)) == (temp[1].charAt(0))) {
-        cards[temp[0]] = ["✓", true] 
+        tempCards.set(temp[0], ["✓", true]);
+        tempCards.set(temp[1], ["✓", true]);
         console.log("Yay!");
       }
       console.log("Reset!");
       temp = [];
     }
-    this.setState({clickedCards: temp})
+    this.setState({clickedCards: temp});
+    this.setState({cards: tempCards});
+    console.log(this.state.cards);
   }
   
-  render() {
-    let cards = ['A','A','B','B','C','C','D','D','E','E','F','F','G','G','H','H'];
-    let currentGameCards = this.shuffleAndMap(cards);
-
-    let cardsForRender = this.createTable(currentGameCards);
-  
+  render() {  
     return(  
       <table>
         <tr>
-          {cardsForRender}
+          {this.createTable(this.state.cards)}
         </tr>
       </table>
     );
