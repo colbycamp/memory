@@ -14,7 +14,6 @@ class Starter extends React.Component {
     this.state = { 
       cards: this.shuffleAndMap(cards),
       clickedCards: [],
-      score: 0,
       clickCount: 0
     };
   }
@@ -44,6 +43,7 @@ class Starter extends React.Component {
   click(clicked) {
     let temp = this.state.clickedCards;
     let tempCards = this.state.cards;
+    this.setState({clickCount: (this.state.clickCount + 1)});
 
     if (temp.length < 1) {
       console.log("Added!");
@@ -52,7 +52,7 @@ class Starter extends React.Component {
       console.log("Added!");
       temp.push(clicked)
       
-      if((temp[0].charAt(0)) == (temp[1].charAt(0))) {
+      if((temp[0] != temp[1]) && (temp[0].charAt(0)) == (temp[1].charAt(0))) {
         tempCards.set(temp[0], ["✓", true]);
         tempCards.set(temp[1], ["✓", true]);
         console.log("Yay!");
@@ -67,11 +67,14 @@ class Starter extends React.Component {
   
   render() {  
     return(  
-      <table>
-        <tr>
-          {this.createTable(this.state.cards)}
-        </tr>
-      </table>
+      <>
+        <div>Score: {this.state.clickCount}</div>
+        <table>
+          <tr>
+            {this.createTable(this.state.cards)}
+          </tr>
+        </table>
+      </>
     );
   }
 }
