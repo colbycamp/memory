@@ -9,39 +9,67 @@ export default function game_init(root) {
 class Starter extends React.Component {
   constructor(props) {
     super(props);
-    this.state = { left: false };
+    this.state = { 
+      cards: {},
+      clickedCards: [],
+      score: 0,
+      clickCount: 0
+    };
   }
 
-  swap(_ev) {
-    let state1 = _.assign({}, this.state, { left: !this.state.left });
-    this.setState(state1);
+  shuffleAndMap(input) {
+    let result = new Map();
+    let temp = _.shuffle(input);
+    for (let i = 0; i < temp.length; i++){
+      // Card Letter, Match has been Completed
+      if(!result.has(temp[i] + "0")){
+        result.set((temp[i] + "0"), false);
+      } else {
+        result.set((temp[i] + "1"), false);
+      }
+    }
+    return result;
   }
 
-  hax(_ev) {
-    alert("hax!");
+  createTable(input){
+    let result = [];
+    for (let i of input.keys()) {
+      result.push(<td onClick={() => {this.click(i)}}>{i}</td>);
+    }
+    return result;
   }
 
+  click(clicked) {
+    let temp = this.state.clickedCards;
+    if (temp.length < 1) {
+      console.log("Added!");
+      temp.push(clicked)
+    } else {
+      console.log("Added!");
+      temp.push(clicked)
+      
+      if((temp[0].charAt(0)) == (temp[1].charAt(0))) {
+        cards[temp[0]] = ["✓", true] 
+        console.log("Yay!");
+      }
+      console.log("Reset!");
+      temp = [];
+    }
+    this.setState({clickedCards: temp})
+  }
+  
   render() {
-    let button = <div className="column" onMouseMove={this.swap.bind(this)}>
-      <p><button onClick={this.hax.bind(this)}>Click Me</button></p>
-    </div>;
+    let cards = ['A','A','B','B','C','C','D','D','E','E','F','F','G','G','H','H'];
+    let currentGameCards = this.shuffleAndMap(cards);
 
-    let blank = <div className="column">
-      <p>Nothing here.</p>
-    </div>;
-
-    if (this.state.left) {
-      return <div className="row">
-        {button}
-        {blank}
-      </div>;
-    }
-    else {
-      return <div className="row">
-        {blank}
-        {button}
-      </div>;
-    }
+    let cardsForRender = this.createTable(currentGameCards);
+  
+    return(  
+      <table>
+        <tr>
+          {cardsForRender}
+        </tr>
+      </table>
+    );
   }
 }
-
