@@ -76,9 +76,10 @@ class Starter extends React.Component {
     let tempCards = this.state.cards;
     let temp = this.state.clickedCards;
 
-    if (tempCards.get(clicked)[0] != "✓") {
+    if (((temp[0] != clicked) && (temp[1] != clicked)) && (tempCards.get(clicked)[0] != "✓")) {
       this.setState({clickCount: (this.state.clickCount + 1)});
       tempCards.set(clicked, [clicked.charAt(0), true]);
+      this.setState({lastClicked: clicked});
 
       if(temp.length >= 2) {
         if (!this.state.matched) {
