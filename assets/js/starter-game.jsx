@@ -14,7 +14,8 @@ class Starter extends React.Component {
     this.state = { 
       cards: this.shuffleAndMap(cards),
       clickedCards: [],
-      clickCount: 0
+      clickCount: 0,
+      matched: false
     };
   }
 
@@ -32,48 +33,97 @@ class Starter extends React.Component {
     return result;
   }
 
-  createTable(input){
+  createTableHelper(input){
     let result = [];
     for (let [key, value] of input) {
-      result.push(<td onClick={() => {this.click(key)}}>{value}</td>);
+      if(value[1]){
+        result.push(<td onClick={() => {this.click(key)}}>{value}</td>);
+      } else {
+        result.push(<td className="hide" onClick={() => {this.click(key)}}>{value}</td>);
+      }
     }
     return result;
   }
 
-  click(clicked) {
-    let temp = this.state.clickedCards;
-    let tempCards = this.state.cards;
-    this.setState({clickCount: (this.state.clickCount + 1)});
-
-    if (temp.length < 1) {
-      console.log("Added!");
-      temp.push(clicked)
-    } else {
-      console.log("Added!");
-      temp.push(clicked)
-      
-      if((temp[0] != temp[1]) && (temp[0].charAt(0)) == (temp[1].charAt(0))) {
-        tempCards.set(temp[0], ["✓", true]);
-        tempCards.set(temp[1], ["✓", true]);
-        console.log("Yay!");
-      }
-      console.log("Reset!");
-      temp = [];
+  createTable(input){
+    let result = [];
+    let temp = this.splitArray(this.createTableHelper(input), 4);
+    for(let i of temp) {
+      result.push(<tr>{i}</tr>);
     }
-    this.setState({clickedCards: temp});
-    this.setState({cards: tempCards});
-    console.log(this.state.cards);
+    return result;
+  }
+
+  splitArray(arr, n) {
+    let result = [];
+    while (arr.length) {
+      result.push(arr.splice(0, n));
+    }
+    return result;
+  }
+
+  reset() {
+    let cards = ['A','A','B','B','C','C','D','D','E','E','F','F','G','G','H','H'];
+    this.setState({
+      cards: this.shuffleAndMap(cards),
+      clickedCards: [],
+      clickCount: 0,
+      matched: false
+    });
+  }
+
+  click(clicked) {
+    let tempCards = this.state.cards;
+    let temp = this.state.clickedCards;
+
+    if (tempCards.get(clicked)[0] != "✓") {
+      this.setState({clickCount: (this.state.clickCount + 1)});
+      tempCards.set(clicked, [clicked.charAt(0), true]);
+
+      if(temp.length >= 2) {
+        if (!this.state.matched) {
+          tempCards.set(temp[0], [temp[0].charAt(0), false]);
+          tempCards.set(temp[1], [temp[1].charAt(0), false]);
+        }
+        console.log("Reset!");
+        temp = [];
+      } 
+
+      if (temp.length < 1) {
+        console.log("Added!");
+        temp.push(clicked)
+
+      } else {
+        console.log("Added!");
+        temp.push(clicked)
+        
+        if((temp[0] != temp[1]) && (temp[0].charAt(0)) == (temp[1].charAt(0))) {
+          tempCards.set(temp[0], ["✓", true]);
+          tempCards.set(temp[1], ["✓", true]);
+          this.setState({matched: true});
+          console.log("Yay!");
+        } else {
+          this.setState({matched: false});
+        }
+      }
+      this.setState({clickedCards: temp});
+      this.setState({cards: tempCards});
+      console.log(this.state.cards);
+    }
   }
   
   render() {  
     return(  
       <>
         <div>Score: {this.state.clickCount}</div>
+        <br />
         <table>
-          <tr>
-            {this.createTable(this.state.cards)}
-          </tr>
+          <tbody>
+           {this.createTable(this.state.cards)}
+          </tbody>
         </table>
+        <br />
+        <button onClick={() => {this.reset()}}> RESET </button>
       </>
     );
   }
